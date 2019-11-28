@@ -22,6 +22,7 @@ public class MainView extends VerticalLayout {
   private Button updateNote;
   private Button deleteNote;
   private Dialog dialog;
+  private Note selectedNote;
 
   public MainView() {
     this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -41,6 +42,11 @@ public class MainView extends VerticalLayout {
     noteGrid.setItems(noteList);
     noteGrid.setWidth("800px");
     noteGrid.setColumnReorderingAllowed(true);
+    noteGrid.addItemClickListener(noteItemClickEvent -> {
+
+    });
+
+
     HorizontalLayout gridLayout = new HorizontalLayout(noteGrid);
     add(gridLayout);
 
@@ -53,14 +59,21 @@ public class MainView extends VerticalLayout {
 
     });
     updateNote = new Button("Wyświetl");
+    updateNote.setEnabled(false);
     updateNote.addClickListener(event -> {
       dialog = new NoteDialog(Operation.EDIT);
       dialog.open();
 
     });
     deleteNote = new Button("Usuń");
+    deleteNote.setEnabled(false);
+    deleteNote.addClickListener(event ->{
+
+
+    });
     horizontalLayout.add(addNote, updateNote, deleteNote);
     add(horizontalLayout);
+
 
 
     Button button = new Button("xxx");

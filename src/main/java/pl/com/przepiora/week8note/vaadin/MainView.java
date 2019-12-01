@@ -43,9 +43,10 @@ public class MainView extends VerticalLayout {
     noteGrid.setWidth("800px");
     noteGrid.setColumnReorderingAllowed(true);
     noteGrid.addItemClickListener(noteItemClickEvent -> {
-
+      boolean isGridItemSelected = !noteGrid.getSelectedItems().isEmpty();
+      setEnabledButtons(isGridItemSelected);
+      selectedNote = noteItemClickEvent.getItem();
     });
-
 
     HorizontalLayout gridLayout = new HorizontalLayout(noteGrid);
     add(gridLayout);
@@ -55,36 +56,31 @@ public class MainView extends VerticalLayout {
     addNote.addClickListener(event -> {
       dialog = new NoteDialog(Operation.ADD);
       dialog.open();
-      dialog.addDetachListener(eventClose -> refreshGrid());
-
+      dialog.addDetachListener(eventClose -> {
+        refreshGrid();
+        setEnabledButtons(false);
+      });
     });
+
     updateNote = new Button("Wyświetl");
     updateNote.setEnabled(false);
     updateNote.addClickListener(event -> {
-      dialog = new NoteDialog(Operation.EDIT);
+      dialog = new NoteDialog(selectedNote);
       dialog.open();
-
+      dialog.addDetachListener(eventClose -> {
+        refreshGrid();
+        setEnabledButtons(false);
+      });
     });
     deleteNote = new Button("Usuń");
     deleteNote.setEnabled(false);
-    deleteNote.addClickListener(event ->{
-
-
+    deleteNote.addClickListener(event -> {
+      restApiManager.deleteNote(selectedNote.getId());
+      setEnabledButtons(false);
+      refreshGrid();
     });
     horizontalLayout.add(addNote, updateNote, deleteNote);
     add(horizontalLayout);
-
-
-
-    Button button = new Button("xxx");
-    add(button);
-    button.addClickListener(event -> {
-//      Dialog dialog = new NoteDialog();
-//      dialog.open();
-//
-//      Note note = new Note(LocalDate.now(), "dfdsf", "dfsdfsf");
-//      restApiManager.addNote(note);
-    });
   }
 
   private String getFooterRefresh() {
@@ -103,5 +99,10 @@ public class MainView extends VerticalLayout {
       return text;
     }
     return text.substring(0, length) + " ...";
+  }
+
+  private void setEnabledButtons(boolean isEnabled) {
+    updateNote.setEnabled(isEnabled);
+    deleteNote.setEnabled(isEnabled);
   }
 }

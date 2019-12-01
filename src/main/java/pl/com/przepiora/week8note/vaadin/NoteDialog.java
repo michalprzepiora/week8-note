@@ -19,6 +19,7 @@ public class NoteDialog extends Dialog {
   private Button updateButton;
   private Button cancelButton;
   private RestApiManager restApiManager;
+  private Note note;
 
   public NoteDialog(Operation operation) {
     restApiManager = new RestApiManager();
@@ -28,22 +29,28 @@ public class NoteDialog extends Dialog {
 
     titleTextField = new TextField("Tytuł");
     titleTextField.setWidth("700px");
+    titleTextField.addInputListener(event -> updateButton.setEnabled(true));
     mainView.add(titleTextField);
 
     messageTextArea = new TextArea("Treść");
     messageTextArea.setWidth("700px");
     messageTextArea.setHeight("400px");
+    messageTextArea.addInputListener(event -> updateButton.setEnabled(true));
     mainView.add(messageTextArea);
 
     HorizontalLayout horizontalLayout = new HorizontalLayout();
     addButton = new Button("Dodaj");
     addButton.addClickListener(event -> saveNote());
     updateButton = new Button("Zapisz zmiany");
+    updateButton.addClickListener(event->saveNote());
     cancelButton = new Button("Anuluj");
+    cancelButton.addClickListener(buttonClickEvent -> this.close());
+
     if (operation.equals(Operation.ADD)) {
       horizontalLayout.add(addButton);
     } else {
       horizontalLayout.add(updateButton);
+
     }
     horizontalLayout.add(cancelButton);
     mainView.add(horizontalLayout);
@@ -51,8 +58,19 @@ public class NoteDialog extends Dialog {
     add(mainView);
   }
 
+  public NoteDialog(Note note) {
+    this(Operation.EDIT);
+    this.note = note;
+    titleTextField.setValue(note.getTitle());
+    messageTextArea.setValue(note.getText());
+    updateButton.setEnabled(false);
+  }
+
   private void saveNote() {
-    Note note = new Note(LocalDate.now(),titleTextField.getValue(),messageTextArea.getValue());
+    Note note = new Note(LocalDate.now(), titleTextField.getValue(), messageTextArea.getValue());
+    if (this.note != null) {
+      note.setId(this.note.getId());
+    }
     restApiManager.addNote(note);
     this.close();
   }

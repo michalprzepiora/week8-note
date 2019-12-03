@@ -10,7 +10,7 @@ import java.util.List;
 public class RestApiManager {
 
   private RestTemplate restTemplate;
-  private static final String HOME_URL = "http://localhost:8080";
+  private static final String HOME_URL = "http://https://week8-note.herokuapp.com:8080";
 
 
   public RestApiManager() {
